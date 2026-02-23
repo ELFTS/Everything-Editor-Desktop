@@ -43,12 +43,12 @@ jobs:
     - name: Update remotes
       run: |
         sudo flatpak update --appstream
-        
+
     - name: Install runtimes
       run: |
-        flatpak --user install -y --noninteractive flathub org.freedesktop.Platform//24.08
-        flatpak --user install -y --noninteractive flathub org.freedesktop.Sdk//24.08
-        flatpak --user install -y --noninteractive flathub org.electronjs.Electron2.BaseApp//24.08
+        sudo flatpak install -y --noninteractive flathub org.freedesktop.Platform//24.08
+        sudo flatpak install -y --noninteractive flathub org.freedesktop.Sdk//24.08
+        sudo flatpak install -y --noninteractive flathub org.electronjs.Electron2.BaseApp//24.08
 
     - name: Build Linux app
       run: npm run build:linux
