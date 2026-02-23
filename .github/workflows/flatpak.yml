@@ -1,4 +1,5 @@
 name: flatpak
+
 on:
   workflow_dispatch:
 
@@ -55,16 +56,4 @@ jobs:
       with:
         name: linux-flatpak-x64
         path: dist/*.flatpak
-        retention-days: 1
- s
-
-    - name: Package
-      run: |
-        node release-automation/build.mjs ${{ matrix.args }} --production
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: mac-${{ matrix.target }}
-        path: dist/*.dmg
         retention-days: 1
