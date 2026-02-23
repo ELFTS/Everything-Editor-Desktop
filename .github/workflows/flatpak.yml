@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       # -----------------------------
-      # 安装 Node
+      # 安装  Node
       # -----------------------------
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -29,7 +29,7 @@ jobs:
         run: npm run fetch
 
       # -----------------------------
-      # 安装 Flatpak & Runtime
+      # 安装  Flatpak & Runtime
       # -----------------------------
       - name: Install Flatpak & Runtimes
         run: |
@@ -48,14 +48,14 @@ jobs:
           sudo flatpak list --system
 
       # -----------------------------
-      # 构建 Linux + Flatpak
+      # 构建  Linux + Flatpak
       # -----------------------------
       - name: Build Linux + Flatpak
         run: |
           npm run build:linux
 
       # -----------------------------
-      # 上传 Flatpak 构建产物
+      # 上传  Flatpak 构建产物
       # -----------------------------
       - name: Upload Flatpak artifact
         uses: actions/upload-artifact@v4
