@@ -34,6 +34,18 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y flatpak flatpak-builder
         sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+    - name: Add Flathub remote
+      run: |
+        sudo flatpak remote-add --if-not-exists flathub \
+          https://flathub.org/repo/flathub.flatpakrepo
+
+    - name: Update remotes
+      run: |
+        sudo flatpak update --appstream
+        
+    - name: Install runtimes
+      run: |
         flatpak --user install -y --noninteractive flathub org.freedesktop.Platform//24.08
         flatpak --user install -y --noninteractive flathub org.freedesktop.Sdk//24.08
         flatpak --user install -y --noninteractive flathub org.electronjs.Electron2.BaseApp//24.08
