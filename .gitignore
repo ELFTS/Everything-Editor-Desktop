@@ -6,10 +6,15 @@ node_modules/
 
 # Built files
 dist
+dist-linux
 dist-renderer-webpack
 dist-library-files
 dist-extensions
+dist-astra-extensions
 src-renderer/packager/standalone.html
+repo
+node_modoles
+.flatpak-builder
 
 # Debian release scripts create files that shouldn't be committed
 deb
