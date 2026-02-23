@@ -4,7 +4,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-linux:
+  # ==========================================
+  # 统一构建步骤 (webpack:prod)
+  # ==========================================
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -12,119 +15,340 @@ jobs:
       with:
         submodules: recursive
         persist-credentials: false
-    - name: Install strip-nondeterminism
-      run: sudo apt-get install strip-nondeterminism
+
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 24
+        cache: 'npm'
+
     - name: Install dependencies
-      run: npm ci --loglevel=info
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info
+
     - name: Fetch
       run: npm run fetch
-    - name: Compile
+
+    - name: Compile (webpack:prod)
       run: npm run webpack:prod
-    - name: Package
-      run: |
-        node release-automation/build.mjs --debian --tarball --appimage --x64 --armv7l --arm64
-    - name: Print file tree
-      run: node scripts/print-file-tree.mjs dist
-    - name: Upload artifacts to GitHub Actions
+
+    - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: linux
+        name: build-artifacts
         path: |
-          dist/*.deb
-          dist/*.tar.gz
-          dist/*.AppImage
+          dist-astra-extensions/
+          dist-extensions/
+          dist-library-files/
+          dist-renderer-webpack/
+        retention-days: 1
 
-  build-mac:
-    runs-on: macos-latest
+  # ==========================================
+  # Linux 标准格式打包 (5格式 × 3架构)
+  # ==========================================
+  package-linux:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        format: [debian, tarball, appimage, pacman, rpm]
+        arch: [x64, armv7l, arm64]
+        include:
+          - format: pacman
+            extra-deps: 'ruby ruby-dev rubygems libarchive-tools'
+          - format: rpm
+            extra-deps: 'rpm ruby ruby-dev rubygems'
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         submodules: recursive
         persist-credentials: false
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y strip-nondeterminism fakeroot ${{ matrix.extra-deps }}
+
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 24
-    - name: Install dependencies
-      run: npm ci --loglevel=info
-    - name: Fetch
-      run: npm run fetch
-    - name: Compile
-      run: npm run webpack:prod
+        cache: 'npm'
+
+    - name: Install fpm
+      if: matrix.format == 'pacman' || matrix.format == 'rpm'
+      run: sudo gem install --no-document fpm
+
+    - name: Install dependencies (skip postinstall)
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info --ignore-scripts
+
     - name: Package
       run: |
-        # Need to run the universal builds as separate commands or it breaks when @electron/universal
-        # diffs the ASARs and finds spurious differences. Not clear why.
-        node release-automation/build.mjs --mac --universal --production
-        node release-automation/build.mjs --mac-legacy-11 --universal --production
-        node release-automation/build.mjs --mac-legacy-10.13-10.14 --mac-legacy-10.15 --x64
-    - name: Print file tree
-      run: node scripts/print-file-tree.mjs dist
-    - name: Upload artifacts to GitHub Actions
+        node release-automation/build.mjs --${{ matrix.format }} --${{ matrix.arch }} --production
+
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: mac
-        path: dist/*.dmg
+        name: linux-${{ matrix.format }}-${{ matrix.arch }}
+        path: dist/*.*
+        retention-days: 1
 
-  build-windows:
-    # GitHub's Windows runners have a C: drive and a D: drive.
-    # C: is for the OS and has good read performance but awful write performance.
-    # D: has much better faster write performance (>20x faster than C:)
-    # We want to use the D: drive whenever we can. Trying to do "npm ci" on the C:
-    # drive has been observed to take over an hour!
-    runs-on: windows-latest
+  flatpak:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - target: x64
+            arch: x64
     steps:
-    # actions/checkout can only clone to paths in $GITHUB_WORKSPACE which is on the C: drive,
-    # so we have to clone to C: then copy to D: after. This repository itself isn't huge so
-    # this is plenty fast.
+    - uses: actions/checkout@v4
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+
+    - name: Install dependencies
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info
+  
+    - name: Fetch
+      run: npm run fetch
+
+
+    - name: Install Flatpak & Runtime
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y flatpak flatpak-builder
+        sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        sudo flatpak install -y --noninteractive flathub org.freedesktop.Platform//24.08
+        sudo flatpak install -y --noninteractive flathub org.freedesktop.Sdk//24.08
+        sudo flatpak install -y --noninteractive flathub org.electronjs.Electron2.BaseApp//24.08
+
+    - name: Build Linux app
+      run: npm run build:linux
+
+    - name: Prepare Flatpak sources
+      run: |
+        cp dist-linux/linux-unpacked/astraeditor-desktop dist-linux/
+
+    - name: Build Flatpak
+      run: |
+        flatpak-builder --repo=repo build-dir flatpak/org.astraeditor.AstraEditor.yml --force-clean
+        flatpak build-bundle repo AstraEditor.flatpak org.astraeditor.AstraEditor
+        mkdir -p dist
+        mv AstraEditor.flatpak dist/
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: linux-flatpak-x64
+        path: dist/*.flatpak
+        retention-days: 1
+  # ==========================================
+  # Linux Snap 打包 (仅 x64)
+  # ==========================================
+  package-linux-snap:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y strip-nondeterminism fakeroot snapd
+
+    - name: Setup Snapcraft
+      run: |
+        sudo snap install snapcraft --classic
+        sudo snap install lxd
+        sudo lxd init --auto
+        sudo usermod -aG lxd $USER
+        newgrp lxd
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'npm'
+
+    - name: Install dependencies (skip postinstall)
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info --ignore-scripts
+
+    - name: Package
+      run: |
+        node release-automation/build.mjs --snap --x64 --production
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-snap-x64
+        path: dist/*.*
+        retention-days: 1
+
+  # ==========================================
+  # Mac 打包
+  # ==========================================
+  package-mac:
+    needs: build
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: modern
+            args: '--mac --universal'
+          - target: legacy-10.13-10.14
+            args: '--mac-legacy-10.13-10.14 --x64'
+          - target: legacy-10.15
+            args: '--mac-legacy-10.15 --x64'
+          - target: legacy-11
+            args: '--mac-legacy-11 --universal'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'npm'
+
+    - name: Install dependencies (skip postinstall)
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info --ignore-scripts
+
+    - name: Package
+      run: |
+        node release-automation/build.mjs ${{ matrix.args }} --production
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: mac-${{ matrix.target }}
+        path: dist/*.dmg
+        retention-days: 1
+
+  # ==========================================
+  # Windows 打包
+  # ==========================================
+  package-windows:
+    needs: build
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: modern-nsis-x64
+            args: '--windows --x64'
+            files: '*.exe'
+          - target: modern-nsis-ia32
+            args: '--windows --ia32'
+            files: '*.exe'
+          - target: modern-nsis-arm64
+            args: '--windows --arm64'
+            files: '*.exe'
+          - target: modern-appx-x64
+            args: '--microsoft-store --x64'
+            files: '*.appx'
+          - target: modern-appx-ia32
+            args: '--microsoft-store --ia32'
+            files: '*.appx'
+          - target: modern-appx-arm64
+            args: '--microsoft-store --arm64'
+            files: '*.appx'
+          - target: portable
+            args: '--windows-portable --x64'
+            files: '*.exe'
+          - target: legacy-x64
+            args: '--windows-legacy --x64'
+            files: '*.exe'
+          - target: legacy-ia32
+            args: '--windows-legacy --ia32'
+            files: '*.exe'
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+    steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         submodules: recursive
         persist-credentials: false
         path: repo
-    - name: "Move repository to D: drive"
+
+    - name: Move to D drive
+      shell: pwsh
       run: |
         Copy-Item -Path repo -Destination D:\repo -Recurse
         Remove-Item -Path repo -Recurse -Force
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: D:\repo\
+
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 24
-    # The repository being on D: means that node_modules IO will be fast, but npm still downloads
-    # packages to a temporary folder for caching which is on C: by default. We need to make sure
-    # npm uses the D: drive instead otherwise we still get bottlenecked by C:.
-    - name: "Configure npm to use D: drive"
+
+    - name: Configure npm cache
+      shell: pwsh
       run: |
         npm config set cache D:\npm-cache
         npm config set prefix D:\npm-prefix
-    - name: Install dependencies
+
+    - name: Install dependencies (skip postinstall)
       working-directory: D:\repo
-      run: npm ci --loglevel=info
-    - name: Fetch
-      working-directory: D:\repo
-      run: npm run fetch
-    - name: Compile
-      working-directory: D:\repo
-      run: npm run webpack:prod
+      run: |
+        Remove-Item -Path package-lock.json -Force -ErrorAction SilentlyContinue
+        npm install --loglevel=info --ignore-scripts
+
     - name: Package
       working-directory: D:\repo
       run: |
-        node release-automation/build.mjs --windows --microsoft-store --x64 --ia32 --arm64
-        node release-automation/build.mjs --windows-portable --x64
-        node release-automation/build.mjs --windows-legacy --ia32 --x64
-    - name: Print file tree
-      working-directory: D:\repo
-      run: node scripts/print-file-tree.mjs dist
-    - name: Upload artifacts to GitHub Actions
+        node release-automation/build.mjs ${{ matrix.args }} --production
+
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: windows
-        path: |
-          D:\repo\dist\*.exe
-          D:\repo\dist\*.appx
+        name: windows-${{ matrix.target }}
+        path: D:\repo\dist\${{ matrix.files }}
+        retention-days: 1
