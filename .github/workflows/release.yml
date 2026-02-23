@@ -100,7 +100,7 @@ jobs:
 # ==========================================
 # Flatpak (独立构建)
 # ==========================================
-  flatpak:
+  package-flatpak:
     needs: build
     runs-on: ubuntu-latest
     strategy:
