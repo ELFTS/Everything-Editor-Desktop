@@ -40,14 +40,19 @@ jobs:
     # -----------------------------
     # 安装 Runtime（显式指定架构）
     # -----------------------------
-    - name: Install runtimes (x86_64 / 24.08)
+    - name: Install runtimes (correct tree)
       run: |
+        sudo flatpak remote-add --if-not-exists --system flathub \
+          https://flathub.org/repo/flathub.flatpakrepo
+
+        sudo flatpak --system --add-arch=x86_64
+
         sudo flatpak --system install -y --noninteractive flathub \
           org.freedesktop.Platform/x86_64/24.08 \
           org.freedesktop.Sdk/x86_64/24.08 \
           org.electronjs.Electron2.BaseApp/x86_64/24.08
 
-        echo "===== Installed Flatpak Runtimes ====="
+        echo "========== INSTALLED =========="
         sudo flatpak --system list
 
     # -----------------------------
