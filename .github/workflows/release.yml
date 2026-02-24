@@ -141,36 +141,49 @@ jobs:
     needs: build
     runs-on: macos-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - args: '--mac --universal'
-            name: modern
+          - target: modern
+            args: '--mac --universal'
+          - target: legacy-10.13-10.14
+            args: '--mac-legacy-10.13-10.14 --x64'
+          - target: legacy-10.15
+            args: '--mac-legacy-10.15 --x64'
+          - target: legacy-11
+            args: '--mac-legacy-11 --universal'
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: 'npm'
 
-      - name: Install dependencies
-        run: |
-          rm -f package-lock.json
-          npm install --ignore-scripts
+    - name: Install dependencies (skip postinstall)
+      run: |
+        rm -f package-lock.json
+        npm install --loglevel=info --ignore-scripts
 
-      - name: Package
-        run: |
-          node release-automation/build.mjs \
-            ${{ matrix.args }} \
-            --production
+    - name: Package
+      run: |
+        node release-automation/build.mjs ${{ matrix.args }} --production
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: mac-${{ matrix.name }}
-          path: dist/*.dmg
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: mac-${{ matrix.target }}
+        path: dist/*.dmg
 
 # ==========================================
 # Windows
@@ -179,41 +192,85 @@ jobs:
     needs: build
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - args: '--windows --x64'
-            name: nsis-x64
+          - target: modern-nsis-x64
+            args: '--windows --x64'
+            files: '*.exe'
+          - target: modern-nsis-ia32
+            args: '--windows --ia32'
+            files: '*.exe'
+          - target: modern-nsis-arm64
+            args: '--windows --arm64'
+            files: '*.exe'
+          - target: modern-appx-x64
+            args: '--microsoft-store --x64'
+            files: '*.appx'
+          - target: modern-appx-ia32
+            args: '--microsoft-store --ia32'
+            files: '*.appx'
+          - target: modern-appx-arm64
+            args: '--microsoft-store --arm64'
+            files: '*.appx'
+          - target: portable
+            args: '--windows-portable --x64'
+            files: '*.exe'
+          - target: legacy-x64
+            args: '--windows-legacy --x64'
+            files: '*.exe'
+          - target: legacy-ia32
+            args: '--windows-legacy --ia32'
+            files: '*.exe'
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
     steps:
-      - uses: actions/checkout@v4
-        with:
-          path: repo
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        persist-credentials: false
+        path: repo
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: repo/
+    - name: Move to D drive
+      shell: pwsh
+      run: |
+        Copy-Item -Path repo -Destination D:\repo -Recurse
+        Remove-Item -Path repo -Recurse -Force
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+        path: D:\repo\
 
-      - name: Install dependencies
-        working-directory: repo
-        run: |
-          Remove-Item package-lock.json -Force -ErrorAction SilentlyContinue
-          npm install --ignore-scripts
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
 
-      - name: Package
-        working-directory: repo
-        run: |
-          node release-automation/build.mjs \
-            ${{ matrix.args }} \
-            --production
+    - name: Configure npm cache
+      shell: pwsh
+      run: |
+        npm config set cache D:\npm-cache
+        npm config set prefix D:\npm-prefix
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: windows-${{ matrix.name }}
-          path: repo/dist/*.exe
+    - name: Install dependencies (skip postinstall)
+      working-directory: D:\repo
+      run: |
+        Remove-Item -Path package-lock.json -Force -ErrorAction SilentlyContinue
+        npm install --loglevel=info --ignore-scripts
+
+    - name: Package
+      working-directory: D:\repo
+      run: |
+        node release-automation/build.mjs ${{ matrix.args }} --production
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-${{ matrix.target }}
+        path: D:\repo\dist\${{ matrix.files }}
 
 # ==========================================
 # 发布到 GitHub Releases
