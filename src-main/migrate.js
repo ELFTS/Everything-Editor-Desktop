@@ -28,7 +28,7 @@ const writeCurrentVersion = async () => {
 };
 
 const openUpdatePage = () => {
-  openExternal('https://desktop.turbowarp.org/');
+  openExternal('https://editors.astras.top/');
 };
 
 /**

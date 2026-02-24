@@ -2,7 +2,22 @@ This document is the authoritative source for TurboWarp's changelogs. Everything
 
 Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
 
-# 1.1.2 (2026-02-00)
+# 1.1.3 (2026-02-24)
+
+- 调整“隐藏工具栏”插件的触发面积并改为默认禁用
+- 修改“调试器”中收藏功能的图标
+- 增加“AstraEditor特性”和“基础设置”
+- 修复部分情况下的主题色错误
+- 修复AstraEditor的默认设置为“undefined”的错误
+- 修复对于过老版本的更新链接还是TurboWarp的问题
+- 修复“循环计时器”默认关闭的问题
+- 为README功能增加显示HTML支持，这需要启用“启用HTML支持”设置
+- 修复关于布尔运算的一些问题
+- 让扩展库加载失败的时候也能显示其它的扩展库
+- 增加“AstraEditor”扩展库按钮
+- 删除“扩展编辑器”功能，我们计划重新制作它
+
+# 1.1.2 (2026-02-14)
 
 - 修改部分功能的观感
 - 修改CSP让桌面端能正确获取更新

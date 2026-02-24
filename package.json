@@ -58,7 +58,7 @@
         "terser-webpack-plugin": "^4.2.3"
     },
     "tw_update": true,
-    "homepage": "https://desktop.turbowarp.org/ ",
+    "homepage": "https://editors.astras.top/ ",
     "repository": {
         "type": "git",
         "url": "https://github.com/AstraEditor/desktop.git "
