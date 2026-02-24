@@ -221,7 +221,6 @@ jobs:
   publish:
     needs:
       - package-linux
-      - package-flatpak
       - package-snap
       - package-mac
       - package-windows
