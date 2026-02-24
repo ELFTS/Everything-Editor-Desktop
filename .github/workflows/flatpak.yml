@@ -1,5 +1,4 @@
 name: flatpak
-
 on:
   workflow_dispatch:
 jobs:
