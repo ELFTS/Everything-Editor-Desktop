@@ -108,9 +108,6 @@ jobs:
       run: npm run webpack:compile
     - name: Package
       run: 
-        ls /home/runner/work/Desktop/Desktop/dist/linux-unpacked/resources/*
-        ls /home/runner/work/Desktop/Desktop/dist/linux-unpacked/*
-        ls /home/runner/work/Desktop/Desktop/dist/*
         ls /home/runner/work/Desktop/Desktop/*
         ls /home/runner/work/Desktop/*
         npm run electron:package:dir
