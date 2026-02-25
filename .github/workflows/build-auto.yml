@@ -108,4 +108,5 @@ jobs:
       run: npm run webpack:compile
     - name: Package
       run: |
-        npm run electron:package:dir
+        npm run electron:package:dir -- --config.disableSanityCheckAsar=true
+        npx --yes asar list dist/linux-unpacked/resources/app.asar | grep -q "src-main/entrypoint.js"
