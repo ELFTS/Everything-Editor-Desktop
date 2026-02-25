@@ -1,5 +1,5 @@
 const path = require('path');
-const {DefinePlugin} = require('webpack');
+const { DefinePlugin } = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const base = {
