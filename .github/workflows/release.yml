@@ -172,6 +172,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       fail-fast: false
+      max-parallel: 2
       matrix:
         include:
           - target: modern-nsis-x64
