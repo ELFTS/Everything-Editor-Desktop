@@ -239,8 +239,6 @@ jobs:
       - name: Download all packages
         uses: actions/download-artifact@v4
         with:
-          # 下载所有产物到 dist 目录
-          # merge-multiple 会把子 artifact 里的内容直接平铺在 dist 文件夹
           path: dist
           merge-multiple: true
 
@@ -248,7 +246,6 @@ jobs:
         shell: bash
         run: |
           shopt -s nullglob
-          # 精准匹配后缀，避开 dist-astra-extensions 等文件夹和 .yml
           FILES=$(ls dist/*.{exe,dmg,deb,zip,tar.gz,AppImage,snap,rpm,zst,appx} 2>/dev/null || true)
           
           if [ -z "$FILES" ]; then

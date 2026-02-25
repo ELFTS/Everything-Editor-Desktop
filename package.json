@@ -71,15 +71,18 @@
     "build": {
         "appId": "org.astraeditor.desktop",
         "productName": "AstraEditor",
+        "asar": true,
+        "asarCheck": false,
         "files": [
-            "node_modules/**/*",
-            "src-main/**/*",
-            "src-preload/**/*",
-            "src-renderer/**/*",
-            "dist-renderer-webpack/**/*",
-            "dist-library-files/**/*",
-            "dist-extensions/**/*",
-            "dist-astra-extensions/**/*"
+            "./node_modules/**/*",
+            "./src-main/**/*",
+            "./src-preload/**/*",
+            "./src-renderer/**/*",
+            "./dist-renderer-webpack/**/*",
+            "./dist-library-files/**/*",
+            "./dist-extensions/**/*",
+            "./dist-astra-extensions/**/*",
+            "!**/node_modules/*/{CHANGELOG.md,README.md,test,obj,bin}"
         ],
         "extraResources": [
             {
