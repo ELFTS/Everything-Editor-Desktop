@@ -1,4 +1,4 @@
-name: Push to AUR
+name: Push to AUR-BIN
 on:
   #workflow_dispatch:
   workflow_run:
