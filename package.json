@@ -73,15 +73,23 @@
         "productName": "AstraEditor",
         "asar": true,
         "files": [
-            "src-main/**/*",
-            "src-preload/**/*",
-            "src-renderer/**/*",
-            "dist-renderer-webpack/**/*",
-            "dist-library-files/**/*",
-            "dist-extensions/**/*",
-            "dist-astra-extensions/**/*",
-            "package.json",
-            "!**/node_modules/*/{CHANGELOG.md,README.md,test,obj,bin}"
+          "**/*",
+          "node_modules/**/*",
+          "!**/*.tsbuildinfo",
+          "!**/*.map",
+          "!**/*.spec.*",
+          "!**/__tests__/**/*",
+          "!**/node_modules/.bin/**",
+          "!**/node_modules/**/*.md",
+          "!**/node_modules/**/*.txt",
+          "!**/node_modules/**/*.log",
+          "!**/.git/**",
+          "!**/.github/**",
+          "!**/.vscode/**",
+          "!**/*.lock",
+          "!pnpm-lock.yaml",
+          "!bun.lockb",
+          "!art/**/*.source.*"
         ],
         "extraResources": [
             {
