@@ -85,7 +85,7 @@ jobs:
                 install -Dm644 "$_icon_path" "$pkgdir/usr/share/icons/hicolor/${_res}x${_res}/apps/astraeditor.png"
               fi
             done
-            }
+          }
           EOF
           sed -i "s/REPLACE_ME_VERSION/${VERSION}/" PKGBUILD
 
