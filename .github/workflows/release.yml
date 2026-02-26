@@ -264,28 +264,30 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 24 # 
 
       - name: Download all packages
         uses: actions/download-artifact@v4
         with:
-          path: dist
+          path: artifacts
           merge-multiple: true
 
       - name: Upload to GitHub Releases
         shell: bash
         run: |
+          cd artifacts
           shopt -s nullglob
-          FILES=$(ls dist/*.{exe,dmg,deb,zip,tar.gz,AppImage,snap,rpm,zst,appx} 2>/dev/null || true)
-          
-          if [ -z "$FILES" ]; then
-            echo "No packages found!"
+          FILES=$(echo *.{exe,dmg,deb,zip,tar.gz,AppImage,snap,rpm,zst,appx})   
+          if [ -z "$FILES" ] || [ "$FILES" = "*."* ]; then
+            echo "错误：未找到任何待上传的二进制文件！"
+            ls -R # 打印当前目录结构方便排查
             exit 1
           fi
-
+          echo "正在上传以下文件: $FILES"
+          cd ..
           node scripts/upload-to-github-releases.mjs \
             "${{ github.repository_owner }}" \
             "${{ github.event.repository.name }}" \
-            "$FILES"
+            "artifacts/$FILES"
         env:
           GH_TOKEN: "${{ github.token }}"
