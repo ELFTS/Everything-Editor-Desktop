@@ -35,7 +35,7 @@ jobs:
           provides=('astraeditor')
           conflicts=('astraeditor')
           options=(!strip !debug)
-          source=("${pkgname}::git+Desktop${url}.git")
+          source=("${pkgname}::git+${url}Desktop.git")
           sha256sums=('SKIP')
 
           build() {
