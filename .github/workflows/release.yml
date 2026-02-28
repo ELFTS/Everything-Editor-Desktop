@@ -47,6 +47,7 @@ jobs:
             dist-extensions/
             dist-library-files/
             dist-renderer-webpack/
+            src-renderer/packager/
 
 # ==========================================
 # Linux 打包 (增加了并发限制和文件同步)

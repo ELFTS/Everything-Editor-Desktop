@@ -42,6 +42,7 @@ jobs:
           dist-extensions/
           dist-library-files/
           dist-renderer-webpack/
+          src-renderer/packager/
         retention-days: 1
 
   # ==========================================
