@@ -596,6 +596,28 @@ class EditorWindow extends ProjectRunningWindow {
       AboutWindow.show();
     });
 
+    this.ipc.handle('check-for-updates', async () => {
+      const { manualCheckForUpdates } = require('../update-checker');
+      const result = await manualCheckForUpdates();
+      if (result.error) {
+        dialog.showMessageBox(this.window, {
+          type: 'error',
+          title: APP_NAME,
+          message: translate('update.check-error'),
+          detail: result.error.message,
+          noLink: true
+        });
+      } else if (!result.hasUpdate) {
+        dialog.showMessageBox(this.window, {
+          type: 'info',
+          title: APP_NAME,
+          message: translate('update.up-to-date'),
+          detail: translate('update.up-to-date-detail').replace('{version}', result.currentVersion),
+          noLink: true
+        });
+      }
+    });
+
     this.ipc.on('get-local-storage', (event, key) => {
       const result = this.window.webContents.executeJavaScript(`localStorage.getItem('${key}')`);
       event.returnValue = result;

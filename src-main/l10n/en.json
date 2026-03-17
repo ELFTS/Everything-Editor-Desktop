@@ -391,6 +391,22 @@
     "string": "Error loading changelog: {error}",
     "developer_comment": "Appears in update available window when changelog could not be loaded, for example because the website is down."
   },
+  "update.check-error": {
+    "string": "Failed to check for updates",
+    "developer_comment": "Appears in dialog when checking for updates fails."
+  },
+  "in-app-about.check-for-updates":{
+    "string":"Check Updates",
+    "developer_comment":"Button to check for updates"
+  },
+  "update.up-to-date": {
+    "string": "You're up to date",
+    "developer_comment": "Appears in dialog when no updates are available."
+  },
+  "update.up-to-date-detail": {
+    "string": "Version {version} is the latest version.",
+    "developer_comment": "Appears in dialog when no updates are available. {version} will be replaced with the current version number."
+  },
   "files.svg": {
     "string": "SVG Image",
     "developer_comment": "Appears in file saving dialog when exporting a vector costume"

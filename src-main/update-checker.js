@@ -107,6 +107,36 @@ const checkForUpdates = async () => {
 };
 
 /**
+ * 手动检查更新，忽略设置并返回结果
+ * @returns {{hasUpdate: boolean, currentVersion: string, latestVersion: string|null, error: Error|null}}
+ */
+const manualCheckForUpdates = async () => {
+  if (!isUpdateCheckerAllowed()) {
+    return { hasUpdate: false, currentVersion, latestVersion: null, error: new Error('Update checker is disabled') };
+  }
+
+  try {
+    const json = await fetchVersionInfo();
+
+    const semverValid = require('semver/functions/valid');
+    const semverLt = require('semver/functions/lt');
+
+    const latestStable = semverValid(json.latest) || currentVersion;
+    const latestUnstable = semverValid(json.latest_unstable) || latestStable;
+    const latest = settings.updateChecker === 'unstable' ? latestUnstable : latestStable;
+
+    if (semverLt(currentVersion, latest)) {
+      UpdateWindow.updateAvailable(currentVersion, latest, false);
+      return { hasUpdate: true, currentVersion, latestVersion: latest, error: null };
+    }
+
+    return { hasUpdate: false, currentVersion, latestVersion: latest, error: null };
+  } catch (error) {
+    return { hasUpdate: false, currentVersion, latestVersion: null, error };
+  }
+};
+
+/**
  * @param {string} version
  * @param {Date} until
  */
@@ -119,5 +149,6 @@ const ignoreUpdate = async (version, until) => {
 module.exports = {
   isUpdateCheckerAllowed,
   checkForUpdates,
+  manualCheckForUpdates,
   ignoreUpdate
 };
