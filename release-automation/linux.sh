@@ -49,18 +49,18 @@ prepare_source() {
 
 update_flatpak() {
 	echo "Updating flatpak"
-	cd "$src/../org.astraeditor.AstraEditor"
+	cd "$src/../org.everythingeditor.EverythingEditor"
 	git checkout master
 	git pull
 	git branch -D "$version" || true
 	git branch "$version"
 	git checkout "$version"
-	sed -E -i "s/commit: [a-f0-9]{40}/commit: $commit/" org.astraeditor.AstraEditor.yaml
+	sed -E -i "s/commit: [a-f0-9]{40}/commit: $commit/" org.everythingeditor.EverythingEditor.yml
 	python3 update-library.py
 	python3 update-packager.py
-	flatpak-node-generator npm ../astraeditor-desktop/package-lock.json
-	flatpak-builder build org.astraeditor.AstraEditor.yaml --force-clean --install --user
-	flatpak run org.astraeditor.AstraEditor
+	flatpak-node-generator npm ../everything-editor-desktop/package-lock.json
+	flatpak-builder build org.everythingeditor.EverythingEditor.yml --force-clean --install --user
+	flatpak run org.everythingeditor.EverythingEditor
 	await_confirmation
 	git stage .
 	git commit -m "Update to $version" -m "Automated"
@@ -69,7 +69,7 @@ update_flatpak() {
 
 update_aur() {
 	echo "Updating AUR"
-	cd "$src/../astraeditor-desktop-bin"
+	cd "$src/../everything-editor-desktop-bin"
 	git checkout master
 	git pull
 	sed -E -i "s/pkgver=.*/pkgver=$version/" PKGBUILD
@@ -79,7 +79,7 @@ update_aur() {
 	updpkgsums
 	makepkg --printsrcinfo > .SRCINFO
 	makepkg -si
-	astraeditor-desktop
+	everything-editor-desktop
 	await_confirmation
 	git stage .
 	git commit -m "Update to $version" -m "Automated"
@@ -93,9 +93,9 @@ update_snap() {
 	npm run webpack:prod
 	npx electron-builder --linux snap --publish never --config.extraMetadata.tw_dist="release-snap-$(uname -m)"
 	snap install --dangerous dist/TurboWarp-*.snap
-	snap run astraeditor-desktop
+	snap run everything-editor-desktop
 	await_confirmation
-	snapcraft upload --release=stable dist/AstraEditor-*.snap
+	snapcraft upload --release=stable dist/Everything-Editor-*.snap
 }
 
 update_debian() {
@@ -111,7 +111,7 @@ update_snap
 update_debian
 
 echo "THINGS YOU STILL NEED TO DO:"
-echo " - Merge flatpak/org.astraeditor.AstraEditor PR"
+echo " - Merge flatpak/org.everythingeditor.EverythingEditor PR"
 echo " - Delete old binaries from Debian repository"
 echo " - Upload to Microsoft Store"
 echo " - Announcements"

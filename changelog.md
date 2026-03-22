@@ -1,7 +1,14 @@
-This document is the authoritative source for TurboWarp's changelogs. Everything else gets generated from this list by `node scripts/generate-changelogs.mjs`.
+This document is the authoritative source for Everything Editor's changelogs. Everything else gets generated from this list by `node scripts/generate-changelogs.mjs`.
 
-Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://desktop.turbowarp.org/).
+Prefix notes with "Windows:", "macOS:", or "Linux:" as needed. Do not use **formatting** or [links](https://github.com/everything-editor/desktop).
 
+# 1.0.0 (2026-03-22)
+
+- 项目更名为"万物编辑器" (Everything Editor)
+
+
+
+<!--  AE's changelog
 # 1.1.4 (2026-03-18)
 
 - 修复打包器无法使用的问题

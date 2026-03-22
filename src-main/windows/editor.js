@@ -230,12 +230,12 @@ const getUnsafePaths = () => {
 
     // TurboWarp Desktop defaults
     {
-      path: path.join(appData, 'astraeditor-desktop'),
-      app: 'AstraEditor Desktop'
+      path: path.join(appData, 'everything-editor-desktop'),
+      app: 'Everything Editor Desktop'
     },
     {
-      path: path.join(localPrograms, 'AstraEditor'),
-      app: 'AstraEditor Desktop'
+      path: path.join(localPrograms, 'Everything Editor'),
+      app: 'Everything Editor Desktop'
     },
 
     // Scratch Desktop defaults

@@ -4,7 +4,7 @@
 
 const {app, dialog} = require('electron');
 
-const APP_NAME = 'AstraEditor Desktop';
+const APP_NAME = 'Everything Editor Desktop';
 const stringifyError = (error) => (error && error.stack) ? error.stack : error;
 
 try {

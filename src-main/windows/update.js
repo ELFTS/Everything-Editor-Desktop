@@ -6,7 +6,7 @@ const packageJSON = require('../../package.json');
 
 const getRepositoryInfo = () => {
   const fallback = {
-    owner: 'AstraEditor',
+    owner: 'everything-editor',
     repo: 'desktop'
   };
 

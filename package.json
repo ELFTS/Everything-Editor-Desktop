@@ -1,6 +1,6 @@
 {
-    "name": "astraeditor-desktop",
-    "description": "TurboWarp mod with more features.",
+    "name": "everything-editor-desktop",
+    "description": "万物编辑器 - Everything Editor Desktop",
     "version": "1.1.4",
     "license": "GPL-3.0",
     "author": {
@@ -60,19 +60,19 @@
         "terser-webpack-plugin": "^4.2.3"
     },
     "tw_update": true,
-    "homepage": "https://editors.astras.top/ ",
+    "homepage": "https://github.com/everything-editor/desktop",
     "repository": {
         "type": "git",
-        "url": "https://github.com/AstraEditor/desktop.git "
+        "url": "https://github.com/everything-editor/desktop.git"
     },
     "bugs": {
-        "url": "https://github.com/AstraEditor/desktop/issues ",
-        "email": "contact@turbowarp.org"
+        "url": "https://github.com/everything-editor/desktop/issues",
+        "email": "2381068747@qq.com"
     },
     "main": "./src-main/entrypoint.js",
     "build": {
-        "appId": "org.astraeditor.desktop",
-        "productName": "AstraEditor",
+        "appId": "org.everythingeditor.desktop",
+        "productName": "Everything Editor",
         "asar": true,
         "files": [
             "**/*",
@@ -119,9 +119,9 @@
         },
         "appx": {
             "artifactName": "${productName}-MS-Store-${version}-${arch}.${ext}",
-            "applicationId": "AstraEditor",
-            "displayName": "AstraEditor",
-            "identityName": "45747KOSHINO.AstraEditorpDesktop",
+            "applicationId": "EverythingEditor",
+            "displayName": "Everything Editor",
+            "identityName": "45747KOSHINO.EverythingEditorDesktop",
             "publisher": "CN=18FA7D4F-01BF-49F2-BF56-782DCEA49C69",
             "publisherDisplayName": "KOSHINO",
             "backgroundColor": "#0099ff",
@@ -202,15 +202,15 @@
             "vendor": "KOSHINO"
         },
         "linux": {
-            "executableName": "astraeditor-desktop",
+            "executableName": "everything-editor-desktop",
             "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
             "icon": "./build/icons/",
-            "synopsis": "Mod of Scratch with a compiler and more features.",
-            "description": "AstraEditor is a TurboWarp mod used to add more practical features to make your writing lightning fast.",
+            "synopsis": "万物编辑器 - Everything Editor",
+            "description": "万物编辑器 (Everything Editor) 是一个功能强大的编辑器。",
             "category": "Development",
             "desktop": {
                 "entry": {
-                    "StartupWMClass": "astraeditor-desktop",
+                    "StartupWMClass": "everything-editor-desktop",
                     "Keywords": "scratch;"
                 }
             },

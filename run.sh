@@ -1,3 +1,3 @@
 #!/bin/sh
-cd /app/share/astraeditor
+cd /app/share/everythingeditor
 exec electron /app/app.asar "$@"

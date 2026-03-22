@@ -7,8 +7,8 @@ const currentVersion = packageJSON.version;
 
 const getRepositoryInfo = () => {
   const fallback = {
-    owner: 'AstraEditor',
-    repo: 'Desktop'
+    owner: 'everything-editor',
+    repo: 'desktop'
   };
 
   const repositoryURL = packageJSON?.repository?.url;

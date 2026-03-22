@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Everything Editor
+Comment=万物编辑器 - Everything Editor
+Exec=everything-editor --ozone-platform-hint=auto --no-sandbox
+Icon=org.everythingeditor.EverythingEditor
+Terminal=false
+Categories=Development;IDE;TextEditor;
+MimeType=text/plain;application/x-code;
+StartupNotify=true

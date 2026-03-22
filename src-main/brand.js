@@ -1,6 +1,6 @@
-const PLATFORM_NAME = 'AstraEditor';
-const APP_NAME = 'AstraEditor Desktop';
-const PACKAGER_NAME = 'AstraEditor Packager';
+const PLATFORM_NAME = 'Everything Editor';
+const APP_NAME = 'Everything Editor Desktop';
+const PACKAGER_NAME = 'Everything Editor Packager';
 
 module.exports = {
   PLATFORM_NAME,

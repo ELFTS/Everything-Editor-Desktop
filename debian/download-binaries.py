@@ -109,8 +109,8 @@ if __name__ == '__main__':
     repository_root = os.path.join(self_directory, 'deb')
 
     download_releases(
-        package_name='astraeditor-desktop',
-        username='AstraEditor',
+        package_name='everything-editor-desktop',
+        username='everything-editor',
         repository='desktop',
         component='main',
         repository_root=repository_root

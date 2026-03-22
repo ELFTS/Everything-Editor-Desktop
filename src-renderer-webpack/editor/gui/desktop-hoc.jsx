@@ -59,7 +59,7 @@ const handleClickAbout = () => {
 };
 
 const handleClickSourceCode = () => {
-  window.open('https://github.com/AstraEditor');
+  window.open('https://github.com/everything-editor');
 };
 
 const handleClickCheckForUpdates = () => {

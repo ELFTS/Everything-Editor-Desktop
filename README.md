@@ -1,8 +1,6 @@
-# AstraEditor Desktop
+# 万物编辑器 Desktop (Everything Editor Desktop)
 
-AstraEditor as a desktop app.
-
-If you're looking for TurboWarp Desktop downloads, head to: https://desktop.turbowarp.org/
+万物编辑器桌面应用程序。
 
 Licensed under the GPLv3.0. See LICENSE for more information.
 
@@ -17,7 +15,7 @@ The website source code is in the `docs` folder.
 We use submodules, so clone using:
 
 ```bash
-git clone --recursive https://github.com/AstraEditor/desktop astraeditor-desktop
+git clone --recursive https://github.com/everything-editor/desktop everything-editor-desktop
 ```
 
 or run this after cloning:
